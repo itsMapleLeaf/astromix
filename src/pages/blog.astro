@@ -1,25 +1,32 @@
 ---
 import Layout from "../app/layout.astro";
-import Nav from "../app/nav.astro";
 
 if (Astro.request.method === 'POST') {
-	console.log(Object.fromEntries(await Astro.request.formData()));
-	return Astro.redirect('/blog?commentSuccess=true')
+	const params = new URLSearchParams(
+		Object.fromEntries(await Astro.request.formData())
+	);
+	params.set('commentSuccess', 'true');
+	return Astro.redirect(`/blog?${params.toString()}`);
 }
 
 const url = new URL(Astro.request.url);
 const commentSuccess = url.searchParams.get('commentSuccess');
+const name = url.searchParams.get('name');
+const comment = url.searchParams.get('comment');
 ---
 
-<Layout>
-	<Nav />
-	<h1>blog</h1>
+<Layout title="blog">
 	<p>add a comment</p>
 
-	<form action="/blog" method="post" style="display: grid; gap: 0.5rem; justify-items: flex-start;">
+	<form method="post" style="display: grid; gap: 0.5rem; justify-items: flex-start;">
 		<label>
 			<div>name</div>
 			<input type="text" name="name" placeholder="your name" />
+			<script type="module">
+				window.addEventListener('router:ready', () => {
+					document.querySelector('input[name="name"]')?.focus()
+				})
+			</script>
 		</label>
 		<label>
 			<div>comment</div>
@@ -29,8 +36,12 @@ const commentSuccess = url.searchParams.get('commentSuccess');
 	</form>
 
 	{commentSuccess && (
+		<>
 		<div style="color: green; font-weight: bold;">
-			thanks for your comment!
+			thanks for your comment, {name}!
 		</div>
+		<p>
+			{comment}</p>
+		</>
 	)}
 </Layout>

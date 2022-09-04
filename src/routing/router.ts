@@ -1,66 +1,108 @@
 import { createBrowserHistory } from "history"
 
-const history = createBrowserHistory()
-
-function navigate(url: string) {
-  history.push(url)
+declare global {
+  var routerInitialized: boolean | undefined
 }
 
-history.listen(async ({ location }) => {
-  const response = await fetch(
-    location.pathname + location.search + location.hash,
+if (!window.routerInitialized) {
+  window.routerInitialized = true
+  initRouter()
+}
+
+function initRouter() {
+  const history = createBrowserHistory()
+  const domParser = new DOMParser()
+
+  const executedScriptUrls = new Set(
+    [...document.scripts].map((script) => script.src),
   )
-  const html = await response.text()
-  const newDocument = new DOMParser().parseFromString(html, "text/html")
-  document.head.innerHTML = newDocument.head.innerHTML
-  document.body.innerHTML = newDocument.body.innerHTML
 
-  addElementListeners()
-})
+  history.listen(async ({ location }) => {
+    const response = await fetch(
+      location.pathname + location.search + location.hash,
+    )
 
-addElementListeners()
+    const newDocument = domParser.parseFromString(
+      await response.text(),
+      "text/html",
+    )
 
-function addElementListeners() {
-  for (const link of document.querySelectorAll("a")) {
-    link.addEventListener("click", (event) => {
-      event.preventDefault()
-      navigate(link.href)
-    })
-  }
+    document.head.replaceWith(newDocument.head)
+    document.body.replaceWith(newDocument.body)
 
-  for (const form of document.querySelectorAll("form")) {
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault()
+    window.dispatchEvent(new Event("router:ready"))
 
-      try {
-        const method = form.method.toUpperCase()
-        const formData = new FormData(form)
-        const searchParams = new URLSearchParams()
+    for (const script of document.scripts) {
+      if (script.dataset.astroRouter) continue
+      if (script.src && executedScriptUrls.has(script.src)) continue
 
-        for (const [key, value] of formData.entries()) {
-          if (typeof value === "string") {
-            searchParams.append(key, value)
-          }
-        }
-
-        let url = new URL(form.action, window.location.origin).href
-        let init: RequestInit = { method }
-        if (method === "GET" || method === "HEAD" || method === "OPTIONS") {
-          url += "?" + searchParams.toString()
-        } else {
-          init.body = searchParams
-          init.headers = {
-            "content-type": "application/x-www-form-urlencoded",
-          }
-        }
-
-        const response = await fetch(url, init)
-        if (response.redirected) {
-          history.push(response.url)
-        }
-      } catch (error) {
-        console.error(error)
+      if (script.src) {
+        executedScriptUrls.add(script.src)
       }
+
+      const newScript = document.createElement("script")
+      newScript.type = script.type
+      newScript.src = script.src
+      newScript.async = script.async
+      newScript.defer = script.defer
+      newScript.innerHTML = script.innerHTML
+      document.head.append(newScript)
+      script.remove()
+    }
+  })
+
+  document.addEventListener("click", (event) => {
+    const link = event.composedPath().find((el): el is HTMLAnchorElement => {
+      return (
+        el instanceof HTMLAnchorElement &&
+        el.href.startsWith(window.location.origin) &&
+        el.target !== "_blank"
+      )
     })
-  }
+    if (!link) return
+
+    event.preventDefault()
+    history.push(link.href)
+  })
+
+  document.addEventListener("submit", async (event) => {
+    const form = event.composedPath().find((el): el is HTMLFormElement => {
+      return el instanceof HTMLFormElement
+    })
+    if (!form) return
+
+    event.preventDefault()
+
+    try {
+      const method = form.method.toUpperCase()
+      const formData = new FormData(form)
+      const searchParams = new URLSearchParams()
+
+      for (const [key, value] of formData.entries()) {
+        if (typeof value === "string") {
+          searchParams.append(key, value)
+        }
+      }
+
+      let url = new URL(form.action, window.location.origin).href
+      let init: RequestInit = { method }
+      if (method === "GET" || method === "HEAD" || method === "OPTIONS") {
+        url += "?" + searchParams.toString()
+      } else {
+        init.body = searchParams
+        init.headers = {
+          "content-type": "application/x-www-form-urlencoded",
+        }
+      }
+
+      const response = await fetch(url, init)
+      if (response.redirected) {
+        history.push(response.url)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  })
+
+  window.dispatchEvent(new Event("router:ready"))
 }

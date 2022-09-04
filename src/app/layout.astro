@@ -1,5 +1,12 @@
 ---
 import Router from "../routing/router.astro";
+import Nav from "./nav.astro";
+
+export type Props = {
+  title: string;
+}
+
+const {title} = Astro.props as Props;
 ---
 <html lang="en">
   <head>
@@ -7,9 +14,11 @@ import Router from "../routing/router.astro";
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>{title}</title>
 	</head>
 	<body>
+	  <Nav />
+	  <h1>{title}</h1>
     <slot />
     <Router />
 	</body>
