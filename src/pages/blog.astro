@@ -1,0 +1,36 @@
+---
+import Layout from "../app/layout.astro";
+import Nav from "../app/nav.astro";
+
+if (Astro.request.method === 'POST') {
+	console.log(Object.fromEntries(await Astro.request.formData()));
+	return Astro.redirect('/blog?commentSuccess=true')
+}
+
+const url = new URL(Astro.request.url);
+const commentSuccess = url.searchParams.get('commentSuccess');
+---
+
+<Layout>
+	<Nav />
+	<h1>blog</h1>
+	<p>add a comment</p>
+
+	<form action="/blog" method="post" style="display: grid; gap: 0.5rem; justify-items: flex-start;">
+		<label>
+			<div>name</div>
+			<input type="text" name="name" placeholder="your name" />
+		</label>
+		<label>
+			<div>comment</div>
+			<textarea name="comment" placeholder="say something nice!" rows={4} cols={50} />
+		</label>
+		<button type="submit">submit</button>
+	</form>
+
+	{commentSuccess && (
+		<div style="color: green; font-weight: bold;">
+			thanks for your comment!
+		</div>
+	)}
+</Layout>
