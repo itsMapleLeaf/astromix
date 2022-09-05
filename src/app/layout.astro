@@ -1,6 +1,6 @@
 ---
 import Router from "../routing/router.astro";
-import Nav from "./nav.astro";
+import PendingIndicator from "./pending-indicator.astro";
 
 export type Props = {
   title: string;
@@ -17,7 +17,15 @@ const {title} = Astro.props as Props;
 		<title>{title}</title>
 	</head>
 	<body>
-	  <Nav />
+	  <header style="width: 100%; display: flex; align-items: center;">
+			<nav>
+				<a href="/">Home</a>
+				<a href="/about">About</a>
+				<a href="/blog">Blog</a>
+			</nav>
+			<div style="flex: 1" />
+			<PendingIndicator />
+		</header>
 	  <h1>{title}</h1>
     <slot />
     <Router />

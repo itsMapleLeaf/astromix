@@ -2,26 +2,25 @@ import { createBrowserHistory, Location } from "history"
 import morphdom from "morphdom"
 import { atom } from "nanostores"
 
+export type RouterState =
+  | { status: "idle" }
+  | { status: "navigating"; location: Location; controller: AbortController }
+  | { status: "submitting"; key: string; controller: AbortController }
+
+export type RouterApi = {
+  subscribe: (callback: (state: RouterState) => void) => () => void
+}
+
 declare global {
-  var routerInitialized: boolean | undefined
+  var Router: RouterApi
 }
 
-if (!window.routerInitialized) {
-  window.routerInitialized = true
-  initRouter()
-}
+export const Router = (globalThis.Router ??= initRouter())
 
-function initRouter() {
-  type RouterState =
-    | { status: "idle" }
-    | { status: "navigating"; location: Location; controller: AbortController }
-    | { status: "submitting"; key: string; controller: AbortController }
-
+function initRouter(): RouterApi {
   const routerState = atom<RouterState>({ status: "idle" })
   const history = createBrowserHistory()
   const domParser = new DOMParser()
-
-  routerState.listen(console.info)
 
   const executedScriptUrls = new Set(
     [...document.scripts].map((script) => script.src),
@@ -50,6 +49,8 @@ function initRouter() {
 
       morphdom(document.head, newDocument.head)
       morphdom(document.body, newDocument.body)
+
+      routerState.off()
 
       for (const script of document.scripts) {
         if (script.src && executedScriptUrls.has(script.src)) continue
@@ -156,5 +157,7 @@ function initRouter() {
     }
   })
 
-  window.dispatchEvent(new Event("router:ready"))
+  return {
+    subscribe: (callback) => routerState.subscribe(callback),
+  }
 }
