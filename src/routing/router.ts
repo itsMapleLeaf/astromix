@@ -63,6 +63,19 @@ function initRouter() {
     if (!link) return
 
     event.preventDefault()
+
+    let linkUrl: URL
+    try {
+      linkUrl = new URL(link.href, window.location.origin)
+    } catch (error) {
+      console.error(error)
+      return
+    }
+
+    if (linkUrl.href === window.location.href) {
+      return
+    }
+
     history.push(link.href)
   })
 
