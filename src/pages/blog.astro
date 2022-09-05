@@ -1,5 +1,6 @@
 ---
 import Layout from "../app/layout.astro";
+import FocusWithin from "../dom/focus-within.astro";
 
 if (Astro.request.method === 'POST') {
 	const params = new URLSearchParams(
@@ -21,12 +22,9 @@ const comment = url.searchParams.get('comment');
 	<form method="post" style="display: grid; gap: 0.5rem; justify-items: flex-start;">
 		<label>
 			<div>name</div>
-			<input type="text" name="name" placeholder="your name" />
-			<script type="module">
-				window.addEventListener('router:ready', () => {
-					document.querySelector('input[name="name"]')?.focus()
-				})
-			</script>
+			<FocusWithin>
+				<input type="text" name="name" placeholder="your name" />
+			</FocusWithin>
 		</label>
 		<label>
 			<div>comment</div>

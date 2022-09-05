@@ -1,0 +1,6 @@
+<div data-focus-within style="display: contents">
+  <slot />
+</div>
+<script is:inline>
+  document.querySelector('[data-focus-within]').firstElementChild.focus?.()
+</script>
