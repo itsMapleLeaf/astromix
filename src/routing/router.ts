@@ -1,4 +1,5 @@
 import { createBrowserHistory } from "history"
+import morphdom from "morphdom"
 
 declare global {
   var routerInitialized: boolean | undefined
@@ -27,8 +28,8 @@ function initRouter() {
       "text/html",
     )
 
-    document.head.replaceWith(newDocument.head)
-    document.body.replaceWith(newDocument.body)
+    morphdom(document.head, newDocument.head)
+    morphdom(document.body, newDocument.body)
 
     window.dispatchEvent(new Event("router:ready"))
 
