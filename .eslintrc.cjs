@@ -16,4 +16,3 @@ module.exports = {
     project: require.resolve("./tsconfig.json"),
   },
 }
-

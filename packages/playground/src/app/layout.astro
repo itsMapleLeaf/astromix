@@ -1,46 +1,46 @@
 ---
-import PendingIndicator from "./pending-indicator.astro";
+import PendingIndicator from "./pending-indicator.astro"
 
 export type Props = {
-  title: string;
+  title: string
 }
 
-const {title} = Astro.props as Props;
+const { title } = Astro.props as Props
 ---
+
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
     <script>
-			import 'astromix'
-		</script>
-	</head>
-	<body>
-	  <header style="width: 100%; display: flex; align-items: center;">
-			<nav>
-				<a href="/">Home</a>
-				<a href="/about">About</a>
-				<a href="/blog">Blog</a>
-			</nav>
-			<div style="flex: 1" />
-			<PendingIndicator />
-		</header>
-	  <h1>{title}</h1>
+      import "astromix"
+    </script>
+  </head>
+  <body>
+    <header style="width: 100%; display: flex; align-items: center;">
+      <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/blog">Blog</a>
+      </nav>
+      <div style="flex: 1"></div>
+      <PendingIndicator />
+    </header>
+    <h1>{title}</h1>
     <slot />
-	</body>
+    <style>
+      :root {
+        font-family: sans-serif;
+      }
+
+      body {
+        max-width: 800px;
+        margin: auto;
+        padding: 1rem;
+      }
+    </style>
+  </body>
 </html>
-
-<style>
-  :root {
-    font-family: sans-serif;
-  }
-
-	body {
-		max-width: 800px;
-		margin: auto;
-		padding: 1rem;
-	}
-</style>
