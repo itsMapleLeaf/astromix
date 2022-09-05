@@ -59,9 +59,7 @@ function initRouter(): RouterApi {
 
   const observer = new MutationObserver((mutations) => {
     for (const node of mutations.flatMap((m) => [...m.addedNodes])) {
-      if (node instanceof HTMLElement) {
-        addListeners(node)
-      }
+      addListeners(node)
     }
   })
 
@@ -76,14 +74,18 @@ function initRouter(): RouterApi {
   })
 
   for (const node of document.body.querySelectorAll("a, form")) {
-    if (node instanceof HTMLElement) addListeners(node)
+    addListeners(node)
   }
 
-  function addListeners(node: HTMLElement) {
-    node.addEventListener("click", handleLinkClick)
-    node.addEventListener("submit", handleFormSubmit)
-    node.addEventListener("mouseenter", triggerPrefetch)
-    node.addEventListener("focus", triggerPrefetch)
+  function addListeners(node: Node) {
+    if (node instanceof HTMLAnchorElement) {
+      node.addEventListener("click", handleLinkClick)
+      node.addEventListener("mouseenter", triggerPrefetch)
+      node.addEventListener("focus", triggerPrefetch)
+    }
+    if (node instanceof HTMLFormElement) {
+      node.addEventListener("submit", handleFormSubmit)
+    }
   }
 
   async function renderPage(location: Location) {
