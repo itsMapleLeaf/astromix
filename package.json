@@ -3,8 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prepare": "pnpm -r run build",
+    "prepare": "pnpm run build",
     "dev": "pnpm -r --parallel run dev",
+    "build": "pnpm -r --stream run build",
+    "start": "pnpm -r --stream run start",
     "lint": "eslint --ext ts,tsx,js,cjs,mjs .",
     "lint-fix": "pnpm lint --fix",
     "format": "prettier --plugin-search-dir=. --write .",
