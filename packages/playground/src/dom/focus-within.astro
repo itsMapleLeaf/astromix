@@ -2,5 +2,8 @@
   <slot />
 </div>
 <script is:inline>
-  document.querySelector("[data-focus-within]").firstElementChild.focus?.()
+  const element = document.querySelector("[data-focus-within]")
+  if (element?.firstElementChild instanceof HTMLElement) {
+    element.firstElementChild.focus()
+  }
 </script>
