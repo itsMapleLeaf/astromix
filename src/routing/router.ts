@@ -34,20 +34,16 @@ function initRouter() {
     window.dispatchEvent(new Event("router:ready"))
 
     for (const script of document.scripts) {
-      if (script.dataset.astroRouter) continue
       if (script.src && executedScriptUrls.has(script.src)) continue
-
-      if (script.src) {
-        executedScriptUrls.add(script.src)
-      }
+      if (script.src) executedScriptUrls.add(script.src)
 
       const newScript = document.createElement("script")
-      newScript.type = script.type
-      newScript.src = script.src
-      newScript.async = script.async
-      newScript.defer = script.defer
+      if (script.type) newScript.type = script.type
+      if (script.src) newScript.src = script.src
+      if (script.async) newScript.async = script.async
+      if (script.defer) newScript.defer = script.defer
       newScript.innerHTML = script.innerHTML
-      document.head.append(newScript)
+      document.body.append(newScript)
       script.remove()
     }
   })
