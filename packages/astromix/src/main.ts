@@ -4,9 +4,35 @@ import morphdom from "morphdom"
 import { atom } from "nanostores"
 
 export type RouterState =
-  | { status: "idle" }
-  | { status: "navigating"; location: Location; controller: AbortController }
-  | { status: "submitting"; key: string; controller: AbortController }
+  | {
+      status: "idle"
+      navigation?: never
+      submission?: never
+      controller?: never
+    }
+  | {
+      status: "navigating"
+      navigation: Navigation
+      submission?: never
+      controller: AbortController
+    }
+  | {
+      status: "submitting"
+      navigation?: never
+      submission: Submission
+      controller: AbortController
+    }
+
+export type Navigation = {
+  location: Location
+}
+
+export type Submission = {
+  key: string
+  action: string
+  method: string
+  formData: FormData
+}
 
 export type RouterApi = {
   subscribe: (callback: (state: RouterState) => void) => () => void
@@ -29,14 +55,15 @@ function initRouter(): RouterApi {
 
   history.listen(async ({ location }) => {
     try {
-      const state = routerState.get()
-      if ("controller" in state) {
-        state.controller.abort()
-      }
+      routerState.get().controller?.abort()
 
       const controller = new AbortController()
 
-      routerState.set({ status: "navigating", controller, location })
+      routerState.set({
+        status: "navigating",
+        navigation: { location },
+        controller,
+      })
 
       const response = await fetch(
         location.pathname + location.search + location.hash,
@@ -70,10 +97,7 @@ function initRouter(): RouterApi {
       console.error(error)
     } finally {
       const state = routerState.get()
-      if (
-        state.status === "navigating" &&
-        state.location.key === location.key
-      ) {
+      if (state.navigation?.location.key === location.key) {
         routerState.set({ status: "idle" })
       }
     }
@@ -142,12 +166,13 @@ function initRouter(): RouterApi {
         }
       }
 
-      const state = routerState.get()
-      if ("controller" in state) {
-        state.controller.abort()
-      }
+      routerState.get().controller?.abort()
 
-      routerState.set({ status: "submitting", controller, key })
+      routerState.set({
+        status: "submitting",
+        controller,
+        submission: { key, action: form.action, method, formData },
+      })
 
       const response = await fetch(url, init)
       if (response.redirected) {
