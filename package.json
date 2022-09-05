@@ -1,5 +1,6 @@
 {
   "name": "astromix-monorepo",
+  "private": true,
   "type": "module",
   "scripts": {
     "prepare": "pnpm -r run build",
