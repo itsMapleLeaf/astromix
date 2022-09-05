@@ -1,8 +1,11 @@
 ---
+import { setTimeout } from "timers/promises";
 import Layout from "../app/layout.astro";
+await setTimeout(1000)
 ---
 <Layout title="about">
 	<p>i made this website</p>
+	<small>this page loads really slowly. sorry!</small>
 	<script is:inline>
 		console.log('hi')
 	</script>

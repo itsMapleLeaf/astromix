@@ -7,17 +7,15 @@ specifiers:
   astro: ^1.1.5
   express: ^4.18.1
   history: ^5.3.0
-  million: 1.12.6-beta.0
   morphdom: ^2.6.1
-  preact: ^10.10.6
+  nanostores: ^0.6.0
 
 dependencies:
   astro: 1.1.5
   express: 4.18.1
   history: 5.3.0
-  million: 1.12.6-beta.0
   morphdom: 2.6.1
-  preact: 10.10.6
+  nanostores: 0.6.0
 
 devDependencies:
   '@astrojs/node': 1.0.1
@@ -2442,10 +2440,6 @@ packages:
       picomatch: 2.3.1
     dev: false
 
-  /million/1.12.6-beta.0:
-    resolution: {integrity: sha512-goPLuaTicGdB8Li5eHfyEqoi/bFcoGNY9N6r/x4etsMx5lYo5gRQe1htNEsIHoA5TCkHQN6P1iakXzLw8YOlgg==}
-    dev: false
-
   /mime-db/1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
     engines: {node: '>= 0.6'}
@@ -2510,6 +2504,11 @@ packages:
     resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+    dev: false
+
+  /nanostores/0.6.0:
+    resolution: {integrity: sha512-CQpKE8wtaJAr66hbg32t0MOAeybzLywU6UsLAX18kyQL/bME+xwhjWpmrvJRBp5kueFy6hs2oHlt3HFpNP+JaA==}
+    engines: {node: ^14.0.0 || ^16.0.0 || >=18.0.0}
     dev: false
 
   /negotiator/0.6.3:
@@ -2738,10 +2737,6 @@ packages:
       nanoid: 3.3.4
       picocolors: 1.0.0
       source-map-js: 1.0.2
-    dev: false
-
-  /preact/10.10.6:
-    resolution: {integrity: sha512-w0mCL5vICUAZrh1DuHEdOWBjxdO62lvcO++jbzr8UhhYcTbFkpegLH9XX+7MadjTl/y0feoqwQ/zAnzkc/EGog==}
     dev: false
 
   /preferred-pm/3.0.3:
