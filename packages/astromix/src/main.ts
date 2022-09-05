@@ -90,29 +90,18 @@ function initRouter(): RouterApi {
     try {
       routerState.get().controller?.abort()
 
-      const locationHref = new URL(
-        location.pathname + location.search + location.hash,
-        window.location.origin,
-      ).href
+      const controller = new AbortController()
 
-      const prefetched = prefetchCache.get(locationHref)
-      let response: Response
-      if (prefetched) {
-        routerState.set({
-          status: "navigating",
-          navigation: { location },
-          controller: prefetched.controller,
-        })
-        response = await prefetched.response
-      } else {
-        const controller = new AbortController()
-        routerState.set({
-          status: "navigating",
-          navigation: { location },
-          controller,
-        })
-        response = await fetch(locationHref, { signal: controller.signal })
-      }
+      routerState.set({
+        status: "navigating",
+        navigation: { location },
+        controller,
+      })
+
+      const response = await fetch(
+        location.pathname + location.search + location.hash,
+        { mode: "same-origin", signal: controller.signal },
+      )
 
       const newDocument = domParser.parseFromString(
         await response.text(),
@@ -170,17 +159,10 @@ function initRouter(): RouterApi {
       return
     }
 
-    if (prefetchCache.has(linkUrl.href)) {
-      return
-    }
-
-    const controller = new AbortController()
-    prefetchCache.set(linkUrl.href, {
-      response: fetch(linkUrl.href),
-      controller,
-    })
-
-    console.log("prefetched", linkUrl.href)
+    const linkPrefetch = document.createElement("link")
+    linkPrefetch.rel = "prefetch"
+    linkPrefetch.href = linkUrl.href
+    link.after(linkPrefetch)
   }
 
   function handleLinkClick(event: MouseEvent): void {

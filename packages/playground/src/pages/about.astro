@@ -2,6 +2,8 @@
 import { setTimeout } from "timers/promises"
 import Layout from "../app/layout.astro"
 await setTimeout(1000)
+
+Astro.response.headers.set("Cache-Control", "max-age=5")
 ---
 
 <Layout title="about">
