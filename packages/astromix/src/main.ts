@@ -139,15 +139,9 @@ function initRouter(): RouterApi {
   }
 
   async function triggerPrefetch(event: Event): Promise<void> {
-    // debugger
-    const link = event.composedPath().find((el): el is HTMLAnchorElement => {
-      return (
-        el instanceof HTMLAnchorElement &&
-        el.target !== "_blank" &&
-        el.rel === "prefetch"
-      )
-    })
-    if (!link) return
+    if (event.defaultPrevented) return
+
+    const link = event.currentTarget as HTMLAnchorElement
 
     let linkUrl: URL
     try {
@@ -169,17 +163,9 @@ function initRouter(): RouterApi {
 
   function handleLinkClick(event: MouseEvent): void {
     if (event.defaultPrevented) return
-
-    const link = event.composedPath().find((el): el is HTMLAnchorElement => {
-      return (
-        el instanceof HTMLAnchorElement &&
-        el.href.startsWith(window.location.origin) &&
-        el.target !== "_blank"
-      )
-    })
-    if (!link) return
-
     event.preventDefault()
+
+    const link = event.currentTarget as HTMLAnchorElement
 
     let linkUrl: URL
     try {
@@ -197,18 +183,13 @@ function initRouter(): RouterApi {
   }
 
   async function handleFormSubmit(event: SubmitEvent): Promise<void> {
+    if (event.defaultPrevented) return
+    event.preventDefault()
+
+    const form = event.currentTarget as HTMLFormElement
     const key = crypto.randomUUID()
 
     try {
-      if (event.defaultPrevented) return
-
-      const form = event.composedPath().find((el): el is HTMLFormElement => {
-        return el instanceof HTMLFormElement
-      })
-      if (!form) return
-
-      event.preventDefault()
-
       const formData = new FormData(form)
       const searchParams = new URLSearchParams()
       for (const [key, value] of formData.entries()) {
