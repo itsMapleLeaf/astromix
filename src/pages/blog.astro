@@ -4,7 +4,7 @@ import FocusWithin from "../dom/focus-within.astro";
 
 if (Astro.request.method === 'POST') {
 	const params = new URLSearchParams(
-		Object.fromEntries(await Astro.request.formData())
+		Object.fromEntries(await Astro.request.formData()) as Record<string, string>
 	);
 	params.set('commentSuccess', 'true');
 	return Astro.redirect(`/blog?${params.toString()}`);
