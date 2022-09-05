@@ -48,27 +48,71 @@ function initRouter(): RouterApi {
   const routerState = atom<RouterState>({ status: "idle" })
   const history = createBrowserHistory()
   const domParser = new DOMParser()
+  const prefetchCache = new Map<
+    string,
+    { response: Promise<Response>; controller: AbortController }
+  >()
 
   const executedScriptUrls = new Set(
     [...document.scripts].map((script) => script.src),
   )
 
-  history.listen(async ({ location }) => {
+  const observer = new MutationObserver((mutations) => {
+    for (const node of mutations.flatMap((m) => [...m.addedNodes])) {
+      if (node instanceof HTMLElement) {
+        addListeners(node)
+      }
+    }
+  })
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  })
+
+  history.listen(({ location }) => {
+    void renderPage(location)
+    prefetchCache.clear()
+  })
+
+  for (const node of document.body.querySelectorAll("a, form")) {
+    if (node instanceof HTMLElement) addListeners(node)
+  }
+
+  function addListeners(node: HTMLElement) {
+    node.addEventListener("click", handleLinkClick)
+    node.addEventListener("submit", handleFormSubmit)
+    node.addEventListener("mouseenter", triggerPrefetch)
+    node.addEventListener("focus", triggerPrefetch)
+  }
+
+  async function renderPage(location: Location) {
     try {
       routerState.get().controller?.abort()
 
-      const controller = new AbortController()
-
-      routerState.set({
-        status: "navigating",
-        navigation: { location },
-        controller,
-      })
-
-      const response = await fetch(
+      const locationHref = new URL(
         location.pathname + location.search + location.hash,
-        { signal: controller.signal },
-      )
+        window.location.origin,
+      ).href
+
+      const prefetched = prefetchCache.get(locationHref)
+      let response: Response
+      if (prefetched) {
+        routerState.set({
+          status: "navigating",
+          navigation: { location },
+          controller: prefetched.controller,
+        })
+        response = await prefetched.response
+      } else {
+        const controller = new AbortController()
+        routerState.set({
+          status: "navigating",
+          navigation: { location },
+          controller,
+        })
+        response = await fetch(locationHref, { signal: controller.signal })
+      }
 
       const newDocument = domParser.parseFromString(
         await response.text(),
@@ -101,9 +145,45 @@ function initRouter(): RouterApi {
         routerState.set({ status: "idle" })
       }
     }
-  })
+  }
 
-  document.addEventListener("click", (event) => {
+  async function triggerPrefetch(event: Event): Promise<void> {
+    // debugger
+    const link = event.composedPath().find((el): el is HTMLAnchorElement => {
+      return (
+        el instanceof HTMLAnchorElement &&
+        el.target !== "_blank" &&
+        el.rel === "prefetch"
+      )
+    })
+    if (!link) return
+
+    let linkUrl: URL
+    try {
+      linkUrl = new URL(link.href, window.location.origin)
+    } catch (error) {
+      console.error(error)
+      return
+    }
+
+    if (linkUrl.href === window.location.href) {
+      return
+    }
+
+    if (prefetchCache.has(linkUrl.href)) {
+      return
+    }
+
+    const controller = new AbortController()
+    prefetchCache.set(linkUrl.href, {
+      response: fetch(linkUrl.href),
+      controller,
+    })
+
+    console.log("prefetched", linkUrl.href)
+  }
+
+  function handleLinkClick(event: MouseEvent): void {
     if (event.defaultPrevented) return
 
     const link = event.composedPath().find((el): el is HTMLAnchorElement => {
@@ -130,9 +210,9 @@ function initRouter(): RouterApi {
     }
 
     history.push(link.href)
-  })
+  }
 
-  document.addEventListener("submit", async (event) => {
+  async function handleFormSubmit(event: SubmitEvent): Promise<void> {
     const key = crypto.randomUUID()
 
     try {
@@ -181,7 +261,7 @@ function initRouter(): RouterApi {
     } catch (error) {
       console.error(error)
     }
-  })
+  }
 
   return {
     subscribe: (callback) => routerState.subscribe(callback),
