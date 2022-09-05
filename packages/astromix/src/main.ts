@@ -1,4 +1,4 @@
-import type { Location } from "history";
+import type { Location } from "history"
 import { createBrowserHistory } from "history"
 import morphdom from "morphdom"
 import { atom } from "nanostores"

@@ -1,0 +1,33 @@
+{
+  "name": "astromix",
+  "version": "0.1.0",
+  "type": "module",
+  "types": "./dist/main.d.ts",
+  "exports": {
+    ".": {
+      "default": "./dist/main.js",
+      "types": "./dist/main.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup --clean",
+    "dev": "tsup --watch"
+  },
+  "tsup": {
+    "entry": [
+      "src/main.ts"
+    ],
+    "target": "node16",
+    "format": "esm",
+    "sourcemap": true,
+    "dts": true
+  },
+  "dependencies": {
+    "history": "^5.3.0",
+    "morphdom": "^2.6.1",
+    "nanostores": "^0.6.0"
+  },
+  "devDependencies": {
+    "tsup": "^6.2.3"
+  }
+}

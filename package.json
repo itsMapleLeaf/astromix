@@ -2,6 +2,8 @@
   "name": "astromix-monorepo",
   "type": "module",
   "scripts": {
+    "prepare": "pnpm -r run build",
+    "dev": "pnpm -r --parallel run dev",
     "lint": "eslint --ext ts,tsx,js,cjs,mjs .",
     "lint-fix": "pnpm lint --fix",
     "format": "prettier --write .",

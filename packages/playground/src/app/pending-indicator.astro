@@ -1,13 +1,13 @@
 <p style="margin: 0;" class="js-pending-indicator">Loading...</p>
 <script>
-  import { Router } from '../routing/router';
+  import { Router } from 'astromix';
   window.addEventListener('load', () => {
     const pendingIndicator = document.querySelector('.js-pending-indicator');
+    if (!pendingIndicator) {
+      throw new Error('Pending indicator not found');
+    }
     Router.subscribe(state => {
       console.log(state)
-      if (!pendingIndicator) {
-        throw new Error('Pending indicator not found');
-      }
       pendingIndicator.textContent = state.status === 'idle' ? '' : 'Loading...';
     });
   })
