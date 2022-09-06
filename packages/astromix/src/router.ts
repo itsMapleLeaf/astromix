@@ -1,9 +1,15 @@
-import { createBrowserHistory, Location } from "history"
+import type { Location } from "history"
+import { createBrowserHistory } from "history"
 import morphdom from "morphdom"
 import { atom } from "nanostores"
 
 export const router: RouterApi =
   typeof window !== "undefined" ? createRouter() : createDummyRouter()
+
+export type RouterApi = {
+  getState: () => RouterState
+  subscribe: (callback: (state: RouterState) => void) => () => void
+}
 
 export type RouterState =
   | {
@@ -36,10 +42,6 @@ export type Submission = {
   formData: FormData
 }
 
-export type RouterApi = {
-  getState: () => RouterState
-  subscribe: (callback: (state: RouterState) => void) => () => void
-}
 function createRouter(): RouterApi {
   const routerState = atom<RouterState>({ status: "idle" })
   const history = createBrowserHistory()
@@ -222,6 +224,7 @@ function createRouter(): RouterApi {
     subscribe: (callback) => routerState.subscribe(callback),
   }
 }
+
 function createDummyRouter(): RouterApi {
   return {
     getState: () => ({ status: "idle" }),
