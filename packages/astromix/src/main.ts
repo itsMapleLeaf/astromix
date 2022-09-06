@@ -35,16 +35,14 @@ export type Submission = {
 }
 
 export type RouterApi = {
+  getState: () => RouterState
   subscribe: (callback: (state: RouterState) => void) => () => void
 }
 
-declare global {
-  var Router: RouterApi
-}
+export const router: RouterApi =
+  typeof window !== "undefined" ? createRouter() : createDummyRouter()
 
-export const Router = (globalThis.Router ??= initRouter())
-
-function initRouter(): RouterApi {
+function createRouter(): RouterApi {
   const routerState = atom<RouterState>({ status: "idle" })
   const history = createBrowserHistory()
   const domParser = new DOMParser()
@@ -229,6 +227,14 @@ function initRouter(): RouterApi {
   }
 
   return {
+    getState: () => routerState.get(),
     subscribe: (callback) => routerState.subscribe(callback),
+  }
+}
+
+function createDummyRouter(): RouterApi {
+  return {
+    getState: () => ({ status: "idle" }),
+    subscribe: () => () => {},
   }
 }
