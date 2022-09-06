@@ -13,15 +13,6 @@
     "build": "tsup --clean && size-limit",
     "dev": "tsup --watch"
   },
-  "tsup": {
-    "entry": [
-      "src/main.ts"
-    ],
-    "target": "node16",
-    "format": "esm",
-    "sourcemap": true,
-    "dts": true
-  },
   "size-limit": [
     {
       "path": "dist/main.js"
