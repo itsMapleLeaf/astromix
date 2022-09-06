@@ -46,10 +46,6 @@ function createRouter(): RouterApi {
   const routerState = atom<RouterState>({ status: "idle" })
   const history = createBrowserHistory()
   const domParser = new DOMParser()
-  const prefetchCache = new Map<
-    string,
-    { response: Promise<Response>; controller: AbortController }
-  >()
 
   const executedScriptUrls = new Set(
     [...document.scripts].map((script) => script.src),
@@ -66,10 +62,7 @@ function createRouter(): RouterApi {
     subtree: true,
   })
 
-  history.listen(({ location }) => {
-    void renderPage(location)
-    prefetchCache.clear()
-  })
+  history.listen(({ location }) => renderPage(location))
 
   for (const node of document.body.querySelectorAll("a, form")) {
     addListeners(node)
