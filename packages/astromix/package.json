@@ -2,20 +2,19 @@
   "name": "astromix",
   "version": "0.1.0",
   "type": "module",
-  "types": "./dist/main.d.ts",
+  "types": "./src/main.ts",
   "exports": {
     ".": {
-      "default": "./dist/main.js",
-      "types": "./dist/main.d.ts"
+      "default": "./src/main.ts",
+      "types": "./src/main.ts"
     }
   },
   "scripts": {
-    "build": "tsup --clean && size-limit",
-    "dev": "tsup --watch"
+    "build": "size-limit"
   },
   "size-limit": [
     {
-      "path": "dist/main.js"
+      "path": "src/main.ts"
     }
   ],
   "dependencies": {
@@ -25,7 +24,6 @@
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^8.0.1",
-    "size-limit": "^8.0.1",
-    "tsup": "^6.2.3"
+    "size-limit": "^8.0.1"
   }
 }
