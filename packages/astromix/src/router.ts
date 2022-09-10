@@ -132,23 +132,25 @@ function createRouter(): RouterApi {
   async function triggerPrefetch(event: Event): Promise<void> {
     if (event.defaultPrevented) return
 
-    const link = event.currentTarget as HTMLAnchorElement
+    const link = event.currentTarget
+    if (!(link instanceof HTMLAnchorElement)) return
+    if (!link.rel.includes("prefetch")) return
+    if (link.href === window.location.href) return
 
-    let linkUrl: URL
-    try {
-      linkUrl = new URL(link.href, window.location.origin)
-    } catch (error) {
-      console.error(error)
-      return
-    }
-
-    if (linkUrl.href === window.location.href) {
-      return
+    for (const existingPrefetch of document.querySelectorAll(
+      "link[rel=prefetch]",
+    )) {
+      if (
+        existingPrefetch instanceof HTMLLinkElement &&
+        existingPrefetch.href === link.href
+      ) {
+        existingPrefetch.remove()
+      }
     }
 
     const linkPrefetch = document.createElement("link")
     linkPrefetch.rel = "prefetch"
-    linkPrefetch.href = linkUrl.href
+    linkPrefetch.href = link.href
     link.after(linkPrefetch)
   }
 
@@ -156,19 +158,9 @@ function createRouter(): RouterApi {
     if (event.defaultPrevented) return
     event.preventDefault()
 
-    const link = event.currentTarget as HTMLAnchorElement
-
-    let linkUrl: URL
-    try {
-      linkUrl = new URL(link.href, window.location.origin)
-    } catch (error) {
-      console.error(error)
-      return
-    }
-
-    if (linkUrl.href === window.location.href) {
-      return
-    }
+    const link = event.currentTarget
+    if (!(link instanceof HTMLAnchorElement)) return
+    if (link.href === window.location.href) return
 
     history.push(link.href)
   }
@@ -177,8 +169,10 @@ function createRouter(): RouterApi {
     if (event.defaultPrevented) return
     event.preventDefault()
 
-    const form = event.currentTarget as HTMLFormElement
-    const key = crypto.randomUUID()
+    const form = event.currentTarget
+    if (!(form instanceof HTMLFormElement)) return
+
+    const submitKey = crypto.randomUUID()
 
     try {
       const formData = new FormData(form)
@@ -207,7 +201,7 @@ function createRouter(): RouterApi {
       routerState.set({
         status: "submitting",
         controller,
-        submission: { key, action: form.action, method, formData },
+        submission: { key: submitKey, action: form.action, method, formData },
       })
 
       const response = await fetch(url, init)
