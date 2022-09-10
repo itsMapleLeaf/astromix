@@ -9,21 +9,25 @@ type BrowserRouterState = RouterState & {
 }
 
 export class BrowserRouter implements Router {
-  routerState = atom<BrowserRouterState>({ status: "idle" })
-  history = createBrowserHistory()
-  domParser = new DOMParser()
+  private active = false
+  private routerState = atom<BrowserRouterState>({ status: "idle" })
+  private history = createBrowserHistory()
+  private domParser = new DOMParser()
 
-  executedScriptUrls = new Set(
+  private executedScriptUrls = new Set(
     [...document.scripts].map((script) => script.src),
   )
 
-  observer = new MutationObserver((mutations) => {
+  private observer = new MutationObserver((mutations) => {
     for (const node of mutations.flatMap((m) => [...m.addedNodes])) {
       this.addListeners(node)
     }
   })
 
   init = () => {
+    if (this.active) return
+    this.active = true
+
     this.observer.observe(document.body, {
       childList: true,
       subtree: true,
