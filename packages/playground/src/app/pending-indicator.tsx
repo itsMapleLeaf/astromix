@@ -1,12 +1,11 @@
-import { router } from "astromix"
+import { router } from "astromix/client"
 import { useEffect, useState } from "preact/hooks"
 
 export function PendingIndicator() {
-  const [state, setState] = useState(router.getState())
-  useEffect(() => router.subscribe(setState), [])
-  return state.status === "idle" ? (
-    <></>
-  ) : (
-    <p style={{ margin: 0 }}>Loading...</p>
+  const [loading, setLoading] = useState(false)
+  useEffect(
+    () => router.subscribe((state) => setLoading(state.status !== "idle")),
+    [],
   )
+  return loading ? <p style={{ margin: 0 }}>Loading...</p> : <></>
 }

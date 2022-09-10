@@ -1,22 +1,25 @@
 {
   "name": "astromix",
-  "version": "0.1.0",
   "type": "module",
-  "types": "./src/main.ts",
+  "version": "0.1.0",
+  "main": "./dist/integration.js",
+  "types": "./dist/integration.d.ts",
   "exports": {
-    ".": {
-      "default": "./src/main.ts",
-      "types": "./src/main.ts"
-    }
+    ".": "./dist/integration.js",
+    "./client": "./client.js"
   },
   "scripts": {
-    "build": "size-limit"
+    "dev": "tsup --watch",
+    "build": "tsup --clean && size-limit"
   },
   "size-limit": [
     {
-      "path": "src/main.ts"
+      "path": "./dist/client.js"
     }
   ],
+  "peerDependencies": {
+    "astro": "^1.2.1"
+  },
   "dependencies": {
     "history": "^5.3.0",
     "morphdom": "^2.6.1",
@@ -24,6 +27,8 @@
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^8.1.0",
-    "size-limit": "^8.1.0"
+    "astro": "^1.2.1",
+    "size-limit": "^8.1.0",
+    "tsup": "^6.2.3"
   }
 }
