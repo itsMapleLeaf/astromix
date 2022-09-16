@@ -1,0 +1,26 @@
+{
+  "name": "astro-actions",
+  "type": "module",
+  "version": "0.1.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./runtime": "./runtime.ts",
+    "./api": "./api.ts"
+  },
+  "scripts": {},
+  "peerDependencies": {
+    "astro": "^1.2.4"
+  },
+  "dependencies": {
+    "@babel/core": "^7.19.1",
+    "@babel/preset-typescript": "^7.18.6",
+    "@babel/traverse": "^7.19.1"
+  },
+  "devDependencies": {
+    "@types/babel__core": "^7.1.19",
+    "@types/babel__traverse": "^7.18.1",
+    "astro": "^1.2.4"
+  }
+}
